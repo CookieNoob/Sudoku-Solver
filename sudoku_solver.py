@@ -1,6 +1,7 @@
 # this program is supposed to solve a sudoku puzzle via backtracking
 
 import numpy as np
+import copy
 
 
 
@@ -8,6 +9,7 @@ class field:
     def __init__(self, playingfield=[]):
         self.field = playingfield
         self.dimension = len(playingfield)
+        self.solutions = []
         
         offsetlist = []
         for i in range(int(np.sqrt(self.dimension))):
@@ -42,6 +44,37 @@ class field:
                             
         return True
         
+    def check_solved(self):
+        for i in range(self.dimension):
+            for j in range(self.dimension):
+                if self.field[i][j] == 0:
+                    return False
+        return self.valid_move()
+        
+    def solve_grid(self):
+        def find_unsolved(self):
+            unsolved = []
+            for i in range(self.dimension):
+                for j in range(self.dimension):
+                    if self.field[i][j] == 0:
+                        unsolved.append([i,j])
+            return unsolved
+        
+        def solve_step(self, unsolved, grid):
+            x,y = unsolved.pop()
+            laststep = len(unsolved) == 0
+            for i in range(self.dimension):
+                grid[x][y] = i+1
+                
+                if self.valid_move():
+                    if laststep:
+                        self.solutions.append(copy.deepcopy(grid))
+                    else:
+                        solve_step(self, unsolved, grid[:])
+                    
+        unsolvedlist = find_unsolved(self)
+        solve_step(self, unsolvedlist, self.field)
+
 
         
         
@@ -58,3 +91,4 @@ testsudoku = field(sudokufield)
 
 testsudoku.solve_grid()
 
+print("saved solutions", testsudoku.solutions)
