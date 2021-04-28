@@ -211,6 +211,9 @@ class sudoku:
                     else:
                         solveStep(self, unsolved[:], copy.deepcopy(grid))
                     
+                        solveStep(self, unsolved[:], grid)
+            grid[x][y] = 0
+
         unsolvedlist = findUnsolved(self)
         solveStep(self, unsolvedlist, copy.deepcopy(self.initialfield))
 
