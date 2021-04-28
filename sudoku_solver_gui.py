@@ -209,8 +209,9 @@ class sudoku:
                     if laststep:
                         self.solutions.append(copy.deepcopy(grid))
                     else:
-                        solveStep(self, unsolved[:], copy.deepcopy(grid))
-                    
+                        solveStep(self, unsolved[:], grid)
+            grid[x][y] = 0
+
         unsolvedlist = findUnsolved(self)
         solveStep(self, unsolvedlist, copy.deepcopy(self.initialfield))
 
@@ -260,8 +261,7 @@ def main():
                     sudokufield.redrawRect(sudokufield.selected)
                 sudokufield.select(pygame.mouse.get_pos())
                 sudokufield.highlightSquare()
-                action = None
-                
+            
             if keystroke.type == pygame.QUIT:
                 running = False
                     
