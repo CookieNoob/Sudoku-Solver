@@ -22,6 +22,15 @@ class sudoku:
         
         self.numberspace = numberspace
         self.draw()
+        
+        self.solutions = []
+        
+        offsetlist = []
+        for i in range(int(np.sqrt(self.numberspace))):
+            for j in range(int(np.sqrt(self.numberspace))):
+                offsetlist.append([i,j])
+        self.offsets = tuple(offsetlist)
+        
     
 
     def select(self, position):
@@ -168,6 +177,42 @@ class sudoku:
                             
                             return False
         return True
+        
+    def check_solved(self):
+        # checks if the current configuration is valid and solved
+        for i in range(self.numberspace):
+            for j in range(self.numberspace):
+                if self.field[i][j] == 0:
+                    return False
+        return self.valid_move()
+        
+    def solveGrid(self):
+        # automatically solves the sudoku
+        
+        def findUnsolved(self):
+            # returns a list of empty spots on the grid
+            unsolved = []
+            for i in range(self.numberspace):
+                for j in range(self.numberspace):
+                    if self.initialfield[i][j] == 0:
+                        unsolved.append([i,j])
+            return unsolved
+        
+        def solveStep(self, unsolved, grid):
+            # loops over the empty spots and tries to find a valid solution there
+            x,y = unsolved.pop()
+            laststep = len(unsolved) == 0
+            for i in range(self.numberspace):
+                grid[x][y] = i+1
+                
+                if self.valid_move(grid):
+                    if laststep:
+                        self.solutions.append(copy.deepcopy(grid))
+                    else:
+                        solveStep(self, unsolved[:], copy.deepcopy(grid))
+                    
+        unsolvedlist = findUnsolved(self)
+        solveStep(self, unsolvedlist, copy.deepcopy(self.initialfield))
 
 
 
@@ -202,7 +247,13 @@ def main():
                 if keystroke.key in keytable:
                     if sudokufield.selected != None:
                         sudokufield.updateSquare(keytable[keystroke.key])
+                if keystroke.key == pygame.K_SPACE:
+                    if len(sudokufield.solutions) == 0:
+                        sudokufield.solveGrid()
                         
+                    sudokufield.field = sudokufield.solutions.pop()
+                    sudokufield.draw()
+                    
             if keystroke.type == pygame.MOUSEBUTTONDOWN:
                 if sudokufield.selected != None:
                     sudokufield.unhighlightSquare()
