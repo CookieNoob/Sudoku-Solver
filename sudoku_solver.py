@@ -11,6 +11,7 @@ class field:
         self.dimension = len(playingfield)
         self.solutions = []
         
+        # list of positions of the upper left corner of the blocks - required for the validity check
         offsetlist = []
         for i in range(int(np.sqrt(self.dimension))):
             for j in range(int(np.sqrt(self.dimension))):
@@ -19,6 +20,9 @@ class field:
 
         
     def valid_move(self, field):
+        # ckecks if the current configuration is valid
+        
+        #rows and collums
         for i in range(self.dimension):
             for j in range(self.dimension):
                 for k in range(self.dimension):
@@ -31,6 +35,7 @@ class field:
                     if field[j][i] == field[k][i] and k != j and field[k][i] != 0:
                         return False
         
+        # blocks
         blocksize = int(np.sqrt(self.dimension))
         blockcount = blocksize
         for blockX in range(blockcount):
@@ -45,6 +50,7 @@ class field:
         return True
         
     def check_solved(self):
+        # checks if the current configuration is valid and solved
         for i in range(self.dimension):
             for j in range(self.dimension):
                 if self.field[i][j] == 0:
@@ -52,7 +58,10 @@ class field:
         return self.valid_move()
         
     def solve_grid(self):
+        # automatically solves the sudoku
+        
         def find_unsolved(self):
+            # returns a list of empty spots on the grid
             unsolved = []
             for i in range(self.dimension):
                 for j in range(self.dimension):
@@ -61,6 +70,7 @@ class field:
             return unsolved
         
         def solve_step(self, unsolved, grid):
+            # loops over the empty spots and tries to find a valid solution there
             x,y = unsolved.pop()
             laststep = len(unsolved) == 0
             for i in range(self.dimension):
@@ -76,14 +86,9 @@ class field:
         solve_step(self, unsolvedlist, self.field)
 
 
-        
-        
 
 
-
-
-
-if __name__ == "__main__":
+def main():
     sudokufield = [[0,0,0,3],[3,4,2,1],[0,1,3,4],[4,3,1,2]]
     testsudoku = field(sudokufield)
     testsudoku.solve_grid()
@@ -112,6 +117,14 @@ if __name__ == "__main__":
     print("gefundene Lösungen: ", len(testsudoku3.solutions))
     print("saved solutions")
     for solution in testsudoku3.solutions:
-        print(solution)
+        for reihe in solution:
+            print(reihe)
+        print()
 
 
+
+
+
+
+if __name__ == "__main__":
+    main()
