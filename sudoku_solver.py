@@ -81,8 +81,6 @@ class field:
                         self.solutions.append(copy.deepcopy(grid))
                     else:
                         solve_step(self, unsolved[:], copy.deepcopy(grid))
-                        solve_step(self, unsolved[:], grid)
-            grid[x][y] = 0
                     
         unsolvedlist = find_unsolved(self)
         solve_step(self, unsolvedlist, self.field)
