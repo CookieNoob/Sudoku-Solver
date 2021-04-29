@@ -1,8 +1,9 @@
 import numpy as np
 import copy
+import random
 import pygame
 pygame.font.init()
-
+random.seed()
 
 
 class sudoku:
@@ -186,15 +187,15 @@ class sudoku:
                     return False
         return self.valid_move()
         
-    def solveGrid(self):
+    def solveGrid(self, grid):
         # automatically solves the sudoku
         
-        def findUnsolved(self):
+        def findUnsolved(self, grid):
             # returns a list of empty spots on the grid
             unsolved = []
             for i in range(self.numberspace):
                 for j in range(self.numberspace):
-                    if self.initialfield[i][j] == 0:
+                    if grid[i][j] == 0:
                         unsolved.append([i,j])
             return unsolved
         
@@ -212,8 +213,72 @@ class sudoku:
                         solveStep(self, unsolved[:], grid)
             grid[x][y] = 0
 
-        unsolvedlist = findUnsolved(self)
-        solveStep(self, unsolvedlist, copy.deepcopy(self.initialfield))
+        unsolvedlist = findUnsolved(self, grid)
+        solveStep(self, unsolvedlist, copy.deepcopy(grid))
+
+
+
+    def generateSudoku(self):
+        emptyRow = [0 for i in range(self.numberspace)]
+        newGrid = [emptyRow[:] for i in range(self.numberspace)]
+        
+        self.fillGrid(newGrid, 0)
+        self.removeNumbers(newGrid)
+        
+        self.initialfield = copy.deepcopy(newGrid)
+        self.field = copy.deepcopy(newGrid)
+
+        self.draw()
+
+        
+    def fillGrid(self, grid, position):
+        row=position//self.numberspace
+        col=position%self.numberspace
+        sqrNbS = int(np.sqrt(self.numberspace))
+        numberList = [i+1 for i in range(self.numberspace)]
+        random.shuffle(numberList)
+        for value in numberList:
+            if not(value in grid[row]):
+                if not value in [grid[i][col] for i in range(self.numberspace)]:
+                    blockX = col//sqrNbS* sqrNbS
+                    blockY = row//sqrNbS* sqrNbS
+                    square = []
+                    for i in range(blockY, blockY + sqrNbS):
+                        square.append(grid[i][blockX : blockX + sqrNbS])
+
+                    #Check that this value has not already be used on this 3x3 square
+                    if not value in (square[0] + square[1] + square[2]):
+                        grid[row][col] = value
+                        if position == self.numberspace**2 - 1:
+                            return True
+                        elif self.fillGrid(grid, position + 1):
+                            return True
+        grid[row][col] = 0
+
+
+    def removeNumbers(self, grid):
+        retry = 4
+        while retry > 0:
+            row = random.randint(0,self.numberspace - 1)
+            col = random.randint(0,self.numberspace - 1)
+            while grid[row][col] == 0:
+                row = random.randint(0,self.numberspace - 1)
+                col = random.randint(0,self.numberspace - 1)
+            backup = grid[row][col]
+            grid[row][col] = 0
+            
+            self.solutions = []
+            self.solveGrid(grid)
+            
+            if len(self.solutions) > 1:
+                grid[row][col] = backup
+                retry -= 1
+        self.solutions = []
+        
+
+
+
+
 
 
 
@@ -250,10 +315,12 @@ def main():
                         sudokufield.updateSquare(keytable[keystroke.key])
                 if keystroke.key == pygame.K_SPACE:
                     if len(sudokufield.solutions) == 0:
-                        sudokufield.solveGrid()
+                        sudokufield.solveGrid(sudokufield.initialfield)
                         
                     sudokufield.field = sudokufield.solutions.pop()
                     sudokufield.draw()
+                if keystroke.key == pygame.K_RETURN:
+                    sudokufield.generateSudoku()
                     
             if keystroke.type == pygame.MOUSEBUTTONDOWN:
                 if sudokufield.selected != None:
